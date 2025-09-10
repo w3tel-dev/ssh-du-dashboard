@@ -1,7 +1,14 @@
 
-import os, shlex, subprocess, time, json, threading
+import json
+import os
+import shlex
+import subprocess
+import threading
+import time
+from datetime import datetime
 from pathlib import Path
-from flask import Flask, render_template, redirect, url_for, request, flash
+
+from flask import Flask, flash, redirect, render_template, url_for
 
 HOSTS_FILE = os.getenv("HOSTS_FILE", "/data/hosts.txt")
 SSH_KEY = os.getenv("SSH_KEY", "/ssh/id_rsa")
@@ -18,13 +25,15 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
 
 # Jinja filter for epoch -> local time string
-from datetime import datetime
+
+
 @app.template_filter("datetime")
 def _jinja2_filter_datetime(ts):
     try:
         return datetime.fromtimestamp(int(ts)).strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
         return str(ts)
+
 
 def read_targets():
     targets = []
@@ -41,6 +50,7 @@ def read_targets():
             targets.append({"target": first, "label": label})
     return targets
 
+
 def ssh_du_script(depth):
     script = f'''
 set -euo pipefail
@@ -50,8 +60,6 @@ USERNAME="$(id -un 2>/dev/null || whoami || echo user)"
 HOME_DIR="${{HOME:-$(getent passwd "$USERNAME" 2>/dev/null | cut -d: -f6)}}"
 [[ -z "$HOME_DIR" ]] && HOME_DIR="$HOME"
 [[ -z "$HOME_DIR" ]] && HOME_DIR="$(pwd)"
-if [[ "$HOME_DIR" == */home/$USERNAME ]]; then
-    HOME_DIR="$(dirname "$(dirname "$HOME_DIR")")"
 fi
 TOTAL_SIZE=""
 if du -sh "$HOME_DIR" 1>/dev/null 2>&1; then
@@ -60,7 +68,9 @@ fi
 if du --version >/dev/null 2>&1; then
     LIST="$(du -h --max-depth={depth} "$HOME_DIR" 2>/dev/null)"
 else
-    LIST="$(find "$HOME_DIR" -mindepth 0 -maxdepth {depth} -type d -print0 2>/dev/null | xargs -0 -I{{}} du -sh "{{}}" 2>/dev/null)"
+    LIST="$(find "$HOME_DIR" -mindepth 0 -maxdepth {depth} -type d \
+        -print0 2>/dev/null | \
+        xargs -0 -I{{}} du -sh "{{}}" 2>/dev/null)"
 fi
 if sort -h </dev/null >/dev/null 2>&1; then
     LIST_SORTED="$(printf "%s\n" "$LIST" | sort -h)"
@@ -76,6 +86,7 @@ printf "%s\n" "$LIST_SORTED"
 printf "LIST_END\n"
 '''
     return script
+
 
 def run_ssh(target):
     remote_cmd = ssh_du_script(DEPTH)
@@ -101,6 +112,7 @@ def run_ssh(target):
         return ok, res.stdout, res.stderr
     except subprocess.TimeoutExpired:
         return False, "", f"Timeout after {CMD_TIMEOUT}s"
+
 
 def parse_output(stdout):
     meta = {"host": "", "user": "", "home": "", "total": ""}
@@ -138,8 +150,11 @@ def parse_output(stdout):
         elif path == home:
             rel = "."
         depth = rel.count("/") if rel != "." else 0
-        entries.append({"size": size, "path": path, "rel": rel, "depth": depth})
+        entries.append(
+            {"size": size, "path": path, "rel": rel, "depth": depth}
+        )
     return meta, entries
+
 
 def scan_all():
     targets = read_targets()
@@ -166,13 +181,16 @@ def scan_all():
         json.dump(results, f, indent=2)
     return results
 
+
 def load_results():
     if RESULTS_FILE.exists():
         with open(RESULTS_FILE, "r") as f:
             return json.load(f)
     return {"generated_at": None, "targets": []}
 
+
 scanning_lock = threading.Lock()
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -184,6 +202,7 @@ def index():
                            targets=targets,
                            results=results,
                            depth=DEPTH)
+
 
 @app.route("/scan", methods=["POST"])
 def scan():
@@ -197,6 +216,7 @@ def scan():
         except Exception as e:
             flash(f"Échec du scan: {e}", "warning")
     return redirect(url_for("index"))
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT)
