@@ -36,3 +36,4 @@ Petit tableau de bord qui se connecte en SSH à une liste `user@host` et affiche
 
 - Si `du --max-depth` n'existe pas sur la cible (BusyBox), fallback via `find`.
 - Pour des arbres plus profonds, augmente `DEPTH` (attention au temps de scan).
+- Si le HOME détecté termine par `/home/<user>` (ex. ISPConfig), le script remonte automatiquement de deux répertoires pour analyser le bon dossier.
