@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.log
+*.sqlite3
+.env
+.venv/
+venv/
+.env.*
+.cache/
+coverage/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+.DS_Store
+# Docker
+**/.env
+**/.env.*

@@ -1,0 +1,17 @@
+services:
+  ssh-du-dashboard:
+    build: .
+    container_name: ssh-du-dashboard
+    restart: always
+    environment:
+      - HOSTS_FILE=/data/hosts.txt
+      - SSH_KEY=/ssh/id_rsa
+      - DEPTH=2
+      - CONNECT_TIMEOUT=8
+      - CMD_TIMEOUT=60
+      - PORT=9090
+    volumes:
+      - ./hosts.txt:/data/hosts.txt:ro
+      - ~/.ssh/id_rsa:/ssh/id_rsa:ro
+    ports:
+      - "9090:9090"

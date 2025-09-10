@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SSH DU Dashboard</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
+    header { display:flex; align-items:center; gap:1rem; }
+    button { padding: .5rem 1rem; border: 1px solid #ccc; background: #f8f8f8; cursor: pointer; }
+    .card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 1rem; margin: 1rem 0; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .meta { color: #666; font-size: .9rem; margin-bottom: .5rem; }
+    .tree { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; background: #fafafa; padding: .75rem; border-radius: 8px; overflow-x: auto; }
+    .target-title { font-weight: 600; font-size: 1.05rem; }
+    .tags { font-size: .85rem; color: #555; }
+    .error { color: #b00020; }
+    .flash { padding: .5rem .75rem; border-radius: 6px; margin:.5rem 0; }
+    .flash.success { background: #e6ffed; border: 1px solid #b7efc5; }
+    .flash.warning { background: #fff7e6; border: 1px solid #ffe3a3; }
+    code { background: #f2f2f2; padding:.1rem .3rem; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SSH DU Dashboard</h1>
+    <form action="/scan" method="post">
+      <button type="submit">Scanner maintenant</button>
+    </form>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <section class="card">
+    <div><strong>Profondeur (DEPTH):</strong> {{ depth }} — change via variable d’env. <code>DEPTH</code>.</div>
+    <div style="margin-top:.25rem"><strong>Fichier cibles:</strong> <code>{{ results.hosts_file }}</code> (monté par <code>./hosts.txt:/data/hosts.txt</code>)</div>
+    <div class="meta">Dernier scan: {% if results.generated_at %}{{ results.generated_at | datetime }}{% else %}jamais{% endif %}</div>
+  </section>
+
+  {% if results.targets and results.targets|length > 0 %}
+    {% for item in results.targets %}
+      <div class="card">
+        <div class="target-title">{{ item.target }}{% if item.label %} <span class="tags">— {{ item.label }}</span>{% endif %}</div>
+        {% if item.error %}
+          <div class="error">Erreur: {{ item.error }}</div>
+        {% else %}
+          <div class="meta">
+            Hôte: {{ item.meta.host }} — Utilisateur: {{ item.meta.user }} — HOME: {{ item.meta.home }} — Total: {{ item.meta.total }}
+          </div>
+          <div class="tree">
+{% for entry in item.entries %}
+{% set indent = "  " * entry.depth %}{{ indent }}• {{ "%-45s"|format(entry.rel) }} ({{ entry.size }})
+{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Ajoute des lignes <code>user@host</code> dans <code>hosts.txt</code> puis lance un scan.</p>
+  {% endif %}
+</body>
+</html>

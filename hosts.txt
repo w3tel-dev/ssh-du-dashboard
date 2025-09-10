@@ -1,0 +1,27 @@
+# Un user@host par ligne. Optionnel: ajoute un libellé après un espace.
+# Exemples :
+# teqtelapiphoneportal@46.28.168.118  Production PhonePortal
+# deploy@10.0.0.5:2222               Dev (port 2222)
+teqtelapiphoneportal@46.28.168.118
+teqtelextw3tel@46.28.168.118
+teqtelextactea@46.28.168.118
+teqtelextracprt@46.28.168.118
+teqtelfacisyst@46.28.168.118
+teqtelmetivphoneportal@46.28.168.118
+teqtelextoccicom@46.28.168.118
+teqtelfctsynaqua@46.28.168.118
+teqtelprectel@46.28.168.118
+teqtelipsetphoneportal@46.28.168.118
+teqtelcampeole@46.28.168.118
+teqtelextracosta@46.28.168.118
+teqteldemophoneportal@46.28.168.118
+teqtelapiphonepilot@46.28.168.118
+teqtelextrve@46.28.168.118
+teqtelextamtrust@46.28.168.118
+teqtelexta2pcom@46.28.168.118
+teqtelextrawebportal@46.28.168.118
+teqtelextitcentrex@46.28.168.118
+teqtelexteqtel@46.28.168.118
+teqtelcopieconforme@46.28.168.118
+teqteldirectelecom@46.28.168.118
+teqtelstaging@46.28.168.118
