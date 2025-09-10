@@ -60,10 +60,6 @@ USERNAME="$(id -un 2>/dev/null || whoami || echo user)"
 HOME_DIR="${{HOME:-$(getent passwd "$USERNAME" 2>/dev/null | cut -d: -f6)}}"
 [[ -z "$HOME_DIR" ]] && HOME_DIR="$HOME"
 [[ -z "$HOME_DIR" ]] && HOME_DIR="$(pwd)"
-if [[ "$HOME_DIR" == */home/$USERNAME || \
-      "$HOME_DIR" == */home/$USERNAME/ ]]; then
-    CANDIDATE="$(dirname "$(dirname "$HOME_DIR")")"
-    [[ "$CANDIDATE" != "/" ]] && HOME_DIR="$CANDIDATE"
 fi
 TOTAL_SIZE=""
 if du -sh "$HOME_DIR" 1>/dev/null 2>&1; then
