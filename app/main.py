@@ -57,23 +57,24 @@ set -euo pipefail
 whoami 1>/dev/null 2>&1 || true
 HOSTNAME="$(hostname 2>/dev/null || uname -n || echo unknown)"
 USERNAME="$(id -un 2>/dev/null || whoami || echo user)"
-HOME_DIR="${{HOME:-$(getent passwd "$USERNAME" 2>/dev/null | cut -d: -f6)}}"
-[[ -z "$HOME_DIR" ]] && HOME_DIR="$HOME"
-[[ -z "$HOME_DIR" ]] && HOME_DIR="$(pwd)"
-if [[ "$HOME_DIR" == */home/$USERNAME || "$HOME_DIR" == */home/$USERNAME/ ]]; then
-    CANDIDATE="$(dirname "$(dirname "$HOME_DIR")")"
-    [[ "$CANDIDATE" != "/" ]] && HOME_DIR="$CANDIDATE"
+if [[ -n "${{BASE_DIR:-}}" ]]; then
+    HOME_DIR="${{BASE_DIR}}"
+else
+    HOME_DIR="${{HOME:-$(getent passwd "$USERNAME" 2>/dev/null | cut -d: -f6)}}"
+    [[ -z "$HOME_DIR" ]] && HOME_DIR="$HOME"
+    [[ -z "$HOME_DIR" ]] && HOME_DIR="$(pwd)"
+    HOME_DIR="$(cd "$HOME_DIR" && cd ../.. && pwd)"
 fi
 TOTAL_SIZE=""
-if du -sh "$HOME_DIR" 1>/dev/null 2>&1; then
-    TOTAL_SIZE="$(du -sh "$HOME_DIR" 2>/dev/null | awk '{{print $1}}')"
+if du -sxh "$HOME_DIR" 1>/dev/null 2>&1; then
+    TOTAL_SIZE="$(du -sxh "$HOME_DIR" 2>/dev/null | awk '{{print $1}}')"
 fi
 if du --version >/dev/null 2>&1; then
-    LIST="$(du -h --max-depth={depth} "$HOME_DIR" 2>/dev/null)"
+    LIST="$(du -xh --max-depth={depth} "$HOME_DIR" 2>/dev/null)"
 else
     LIST="$(find "$HOME_DIR" -mindepth 0 -maxdepth {depth} -type d \
         -print0 2>/dev/null | \
-        xargs -0 -I{{}} du -sh "{{}}" 2>/dev/null)"
+        xargs -0 -I{{}} du -sxh "{{}}" 2>/dev/null)"
 fi
 if sort -h </dev/null >/dev/null 2>&1; then
     LIST_SORTED="$(printf "%s\n" "$LIST" | sort -h)"
