@@ -66,15 +66,15 @@ else
     HOME_DIR="$(cd "$HOME_DIR" && cd ../.. && pwd)"
 fi
 TOTAL_SIZE=""
-if du -sh "$HOME_DIR" 1>/dev/null 2>&1; then
-    TOTAL_SIZE="$(du -sh "$HOME_DIR" 2>/dev/null | awk '{{print $1}}')"
+if du -xsh "$HOME_DIR" 1>/dev/null 2>&1; then
+    TOTAL_SIZE="$(du -xsh "$HOME_DIR" 2>/dev/null | awk '{{print $1}}')"
 fi
 if du --version >/dev/null 2>&1; then
-    LIST="$(du -h --max-depth={depth} "$HOME_DIR" 2>/dev/null)"
+    LIST="$(du -xh --max-depth={depth} "$HOME_DIR" 2>/dev/null)"
 else
     LIST="$(find "$HOME_DIR" -mindepth 0 -maxdepth {depth} -type d \
         -print0 2>/dev/null | \
-        xargs -0 -I{{}} du -sh "{{}}" 2>/dev/null)"
+        xargs -0 -I{{}} du -xsh "{{}}" 2>/dev/null)"
 fi
 if sort -h </dev/null >/dev/null 2>&1; then
     LIST_SORTED="$(printf "%s\n" "$LIST" | sort -h)"
