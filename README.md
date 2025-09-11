@@ -25,6 +25,7 @@ Petit tableau de bord qui se connecte en SSH à une liste `user@host` et affiche
 - `CONNECT_TIMEOUT=8` — timeout de connexion SSH (s).
 - `CMD_TIMEOUT=60` — timeout de la commande distante (s).
 - `PORT=9090` — port HTTP du conteneur.
+- `BASE_DIR` — répertoire de départ pour `du` (défaut: HOME remonté de deux niveaux).
 
 ## Sécurité
 
@@ -36,4 +37,4 @@ Petit tableau de bord qui se connecte en SSH à une liste `user@host` et affiche
 
 - Si `du --max-depth` n'existe pas sur la cible (BusyBox), fallback via `find`.
 - Pour des arbres plus profonds, augmente `DEPTH` (attention au temps de scan).
-- Si le HOME détecté termine par `/home/<user>` (ex. ISPConfig), le script remonte automatiquement de deux répertoires pour analyser le bon dossier.
+- Par défaut, l'analyse commence deux répertoires au-dessus du HOME détecté. Surcharge possible via `BASE_DIR`.
