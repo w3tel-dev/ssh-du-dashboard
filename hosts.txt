@@ -2,6 +2,9 @@
 # Exemples :
 # teqtelapiphoneportal@46.28.168.118  Production PhonePortal
 # deploy@10.0.0.5:2222               Dev (port 2222)
+teqtela2pcom@webserver6.w3tel.net
+teqtelactea@webserver6.w3tel.net
+teqtelamtrust@webserver6.w3tel.net
 teqtelapiphoneportal@46.28.168.118
 teqtelextw3tel@46.28.168.118
 teqtelextactea@46.28.168.118
